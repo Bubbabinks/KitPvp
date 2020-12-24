@@ -1,0 +1,9 @@
+name: KitPvp
+version: 1.0
+author: JBStudios
+main: net.JBStudios.KitPvp.Manager
+api-version: 1.16
+commands:
+    KP:
+        permission: KP
+        permission-message: You do not have permission!
