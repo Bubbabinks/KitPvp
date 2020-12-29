@@ -9,14 +9,18 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+
+import net.JBStudios.KitPvp.Kit.KitListener;
 
 public class GameData implements Listener {
 	
 	public enum PropKeys {
 		Lobby("lobby"),
-		Name("name");
+		Name("name"),
+		WorldSpawn("worldSpawn");
 		
 		String value;
 		
@@ -33,6 +37,8 @@ public class GameData implements Listener {
 	private ArrayList<Coord> spawns;
 	private ArrayList<SpawnMarker> spawnMarkers;
 	
+	private Game game;
+	
 	private boolean spawnMarkersEnabled;
 	
 	private Properties properties;
@@ -42,6 +48,7 @@ public class GameData implements Listener {
 		kits = new ArrayList<Kit>();
 		spawns = new ArrayList<Coord>();
 		spawnMarkers = new ArrayList<SpawnMarker>();
+		game = new Game(this);
 		spawnMarkersEnabled = false;
 		setProperty(PropKeys.Name, name);
 	}
@@ -51,6 +58,7 @@ public class GameData implements Listener {
 		kits = new ArrayList<Kit>();
 		spawns = new ArrayList<Coord>();
 		spawnMarkers = new ArrayList<SpawnMarker>();
+		game = new Game(this);
 		spawnMarkersEnabled = false;
 		for (File file: new File(Manager.getManager().getDataFolder().toString()+"/"+getProperty(PropKeys.Name)).listFiles()) {
 			if (file.getName().contains("kit")) {
@@ -58,7 +66,13 @@ public class GameData implements Listener {
 				try {
 					p.load(new FileInputStream(file));
 				} catch (FileNotFoundException e) {} catch (IOException e) {}
-				kits.add(new Kit(p));
+				Kit kit = new Kit(p);
+				kit.addKitListener(new KitListener() {
+					public void onKitSelected(Player player, Kit kit) {
+						game.addPlayer(player, kit);
+					}
+				});
+				kits.add(kit);
 			}
 		}
 		int i=0;
@@ -129,6 +143,13 @@ public class GameData implements Listener {
 		location.setPitch(0f);
 		Coord coord = new Coord(location);
 		
+		Kit kit = new Kit(coord);
+		kit.addKitListener(new KitListener() {
+			public void onKitSelected(Player player, Kit kit) {
+				game.addPlayer(player, kit);
+			}
+		});
+		
 		kits.add(new Kit(coord));
 	}
 	
@@ -150,6 +171,7 @@ public class GameData implements Listener {
 		for (int i=0;i<spawnMarkers.size();i++) {
 			spawnMarkers.remove(i);
 		}
+		game.disable();
 		HandlerList.unregisterAll(this);
 	}
 	

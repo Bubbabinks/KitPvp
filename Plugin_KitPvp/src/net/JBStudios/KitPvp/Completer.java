@@ -29,8 +29,8 @@ public class Completer implements TabCompleter {
 		args0.add("modify");
 		
 		args2 = new ArrayList<String>();
-		args2.add("list");
 		args2.add("setLobby");
+		args2.add("setWorldSpawn");
 		args2.add("addKit");
 		args2.add("addSpawn");
 		args2.add("showSpawns");

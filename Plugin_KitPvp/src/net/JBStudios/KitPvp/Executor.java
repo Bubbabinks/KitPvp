@@ -134,6 +134,46 @@ public class Executor implements CommandExecutor {
 					}else {
 						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be three: <modify> [name] <showSpawns>");
 					}
+				}else if (args[2].equalsIgnoreCase("setLobby")) {
+					if (args.length == 3) {
+						boolean successful = false;
+						GameData GD = null;
+						for (GameData gameData: gameDataList) {
+							if (gameData.getProperty(PropKeys.Name).equalsIgnoreCase(args[1])) {
+								GD = gameData;
+								successful = true;
+								GD.setProperty(PropKeys.Lobby, new Coord(player.getLocation()).toString());
+								break;
+							}
+						}
+						if (successful) {
+							player.sendMessage(ChatColor.BLUE+""+ChatColor.BOLD+GD.getProperty(PropKeys.Name)+ChatColor.RESET+": "+ChatColor.GREEN+"Lobby has been set!");
+						}else {
+							player.sendMessage(ChatColor.RED+"Invalid game name");
+						}
+					}else {
+						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be three: <modify> [name] <setLobby>");
+					}
+				}else if (args[2].equalsIgnoreCase("setWorldSpawn")) {
+					if (args.length == 3) {
+						boolean successful = false;
+						GameData GD = null;
+						for (GameData gameData: gameDataList) {
+							if (gameData.getProperty(PropKeys.Name).equalsIgnoreCase(args[1])) {
+								GD = gameData;
+								successful = true;
+								GD.setProperty(PropKeys.WorldSpawn, new Coord(player.getLocation()).toString());
+								break;
+							}
+						}
+						if (successful) {
+							player.sendMessage(ChatColor.BLUE+""+ChatColor.BOLD+GD.getProperty(PropKeys.Name)+ChatColor.RESET+": "+ChatColor.GREEN+"World spawn has been set!");
+						}else {
+							player.sendMessage(ChatColor.RED+"Invalid game name");
+						}
+					}else {
+						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be three: <modify> [name] <setWorldSpawn>");
+					}
 				}
 			}else {
 				player.sendMessage(ChatColor.RED+"Unknown arg at space 1: "+args[0]);

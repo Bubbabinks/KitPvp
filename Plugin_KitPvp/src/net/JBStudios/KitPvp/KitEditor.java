@@ -73,15 +73,14 @@ public class KitEditor implements Listener {
 			
 			for (int i=18;i<54;i++) {
 				if (inventory.getItem(i) != null) {
-					if (i == 27) {
-						ItemMeta meta = inventory.getItem(i).getItemMeta();
-						meta.setDisplayName("Click To Leave");
-						inventory.getItem(i).setItemMeta(meta);
-					}else {
-						kit.addItem(new Item(i-18, inventory.getItem(i)));
-					}
+					kit.addItem(new Item(i-18, inventory.getItem(i)));
 				}
 			}
+			
+			ItemMeta meta = inventory.getItem(26).getItemMeta();
+			meta.setDisplayName("Drop To Leave");
+			inventory.getItem(26).setItemMeta(meta);
+			kit.addItem(new Item(8, inventory.getItem(26)));
 			
 			kit.refreshArmorStand();
 			HandlerList.unregisterAll(this);

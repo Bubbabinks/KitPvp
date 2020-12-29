@@ -20,8 +20,11 @@ public class Kit implements Listener {
 	private ArmorStand armorStand;
 	private ArrayList<Item> items;
 	
+	private ArrayList<KitListener> kitListeners;
+	
 	public Kit(Coord coord) {
 		items = new ArrayList<Item>();
+		kitListeners = new ArrayList<KitListener>();
 		armorStand = (ArmorStand)coord.getWorld().spawnEntity(coord, EntityType.ARMOR_STAND);
 		armorStand.setArms(true);
 		Bukkit.getPluginManager().registerEvents(this, Manager.getManager());
@@ -30,6 +33,7 @@ public class Kit implements Listener {
 	
 	public Kit(Properties properties) {
 		items = new ArrayList<Item>();
+		kitListeners = new ArrayList<KitListener>();
 		coord = new Coord(properties.getProperty("coord"));
 		armorStand = (ArmorStand)coord.getWorld().spawnEntity(coord, EntityType.ARMOR_STAND);
 		armorStand.setArms(true);
@@ -67,6 +71,10 @@ public class Kit implements Listener {
 		}
 	}
 	
+	public void addKitListener(KitListener kitListener) {
+		kitListeners.add(kitListener);
+	}
+	
 	@EventHandler
 	public void onDamage(EntityDamageByEntityEvent e) {
 		if (e.getDamager() instanceof Player && e.getEntity() instanceof ArmorStand) {
@@ -74,8 +82,8 @@ public class Kit implements Listener {
 			Player player = (Player) e.getDamager();
 			if (armorStand == this.armorStand) {
 				e.setCancelled(true);
-				if (player.hasPermission("KP") || player.isOp()) {
-					openKitEditor(player);
+				for (KitListener kitListener: kitListeners) {
+					kitListener.onKitSelected(player, this);
 				}
 			}
 		}
@@ -123,6 +131,10 @@ public class Kit implements Listener {
 	public void disable() {
 		armorStand.remove();
 		HandlerList.unregisterAll(this);
+	}
+	
+	public interface KitListener {
+		public void onKitSelected(Player player, Kit kit);
 	}
 	
 }
