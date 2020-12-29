@@ -18,6 +18,9 @@ public class Coord extends Location {
 				Double.parseDouble(location.substring(1, location.length()-1).split(",")[3]));
 		setPitch(Float.parseFloat(location.substring(1, location.length()-1).split(",")[4]));
 		setYaw(Float.parseFloat(location.substring(1, location.length()-1).split(",")[5]));
+		while (getWorld() == null) {
+			setWorld(Bukkit.getWorld(location.substring(1, location.length()-1).split(",")[0]));
+		}
 	}
 	
 	public String toString() {

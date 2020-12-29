@@ -73,7 +73,25 @@ public class Executor implements CommandExecutor {
 					player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be two: <remove> [name]");
 				}
 			}else if (args[0].equalsIgnoreCase("modify")) {
-				
+				if (args[2].equalsIgnoreCase("addKit")) {
+					if (args.length == 3) {
+						boolean successful = false;
+						for (GameData gameData: gameDataList) {
+							if (gameData.getProperty(PropKeys.Name).equalsIgnoreCase(args[1])) {
+								successful = true;
+								gameData.addKit(player.getLocation());
+								break;
+							}
+						}
+						if (successful) {
+							player.sendMessage("Kit has been successfully created!");
+						}
+					}else {
+						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be two: <modify> [name] <addKit>");
+					}
+				}else if (args[2].equalsIgnoreCase("addSpawn")) {
+					
+				}
 			}else {
 				player.sendMessage(ChatColor.RED+"Unknown arg at space 1: "+args[0]);
 			}

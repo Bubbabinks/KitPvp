@@ -28,18 +28,15 @@ public class Manager extends JavaPlugin {
 		
 		File file = getDataFolder();
 		if (file.exists()) {
-			file = new File(file.toString()+"/games");
-			if (file.exists()) {
-				for (File propertiesFile: file.listFiles()) {
-					Properties properties = new Properties();
-					try {
-						properties.load(new FileInputStream(new File(propertiesFile+"/gameData.properties")));
-						gameDataList.add(new GameData(properties));
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+			for (File propertiesFile: file.listFiles()) {
+				Properties properties = new Properties();
+				try {
+					properties.load(new FileInputStream(new File(propertiesFile+"/gameData.properties")));
+					gameDataList.add(new GameData(properties));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -57,18 +54,15 @@ public class Manager extends JavaPlugin {
 		if (!file.exists()) {
 			file.mkdir();
 		}
-		file = new File(file.toString()+"/games");
-		if (!file.exists()) {
-			file.mkdir();
-		}else {
-			for (File inFile: file.listFiles()) {
-				fileDeletor(inFile);
-			}
+		
+		for (File inFile: file.listFiles()) {
+			fileDeletor(inFile);
 		}
+		
 		for (GameData gameData: gameDataList) {
-			file = new File(getDataFolder()+"/games/"+gameData.getProperty(PropKeys.Name));
+			file = new File(getDataFolder()+"/"+gameData.getProperty(PropKeys.Name));
 			file.mkdir();
-			file = new File(getDataFolder()+"/games/"+gameData.getProperty(PropKeys.Name)+"/gameData.properties");
+			file = new File(getDataFolder()+"/"+gameData.getProperty(PropKeys.Name)+"/gameData.properties");
 			try {
 				gameData.getProperties().store(new FileOutputStream(file), "");
 			} catch (FileNotFoundException e) {
@@ -76,6 +70,7 @@ public class Manager extends JavaPlugin {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			gameData.disable();
 		}
 		
 		getLogger().info(ChatColor.RED+""+ChatColor.BOLD+"KITPVP: "+ChatColor.RESET+""+ChatColor.RED+"has been disabled!");
