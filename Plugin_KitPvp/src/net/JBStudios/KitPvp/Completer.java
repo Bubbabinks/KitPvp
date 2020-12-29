@@ -33,7 +33,7 @@ public class Completer implements TabCompleter {
 		args2.add("setLobby");
 		args2.add("addKit");
 		args2.add("addSpawn");
-		args2.add("removeSpawn");
+		args2.add("showSpawns");
 	}
 	
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

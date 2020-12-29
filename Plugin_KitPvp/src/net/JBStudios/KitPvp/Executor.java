@@ -12,8 +12,8 @@ import net.JBStudios.KitPvp.GameData.PropKeys;
 
 public class Executor implements CommandExecutor {
 	
-	Manager manager;
-	ArrayList<GameData> gameDataList;
+	private Manager manager;
+	private ArrayList<GameData> gameDataList;
 	
 	public Executor() {
 		manager = Manager.getManager();
@@ -60,6 +60,7 @@ public class Executor implements CommandExecutor {
 					for (int i=0;i<gameDataList.size();i++) {
 						if (gameDataList.get(i).getProperty(PropKeys.Name).equalsIgnoreCase(args[1])) {
 							name = gameDataList.get(i).getProperty(PropKeys.Name);
+							gameDataList.get(i).disable();
 							gameDataList.remove(i);
 							successful = true;
 						}
@@ -76,21 +77,63 @@ public class Executor implements CommandExecutor {
 				if (args[2].equalsIgnoreCase("addKit")) {
 					if (args.length == 3) {
 						boolean successful = false;
+						GameData GD = null;
 						for (GameData gameData: gameDataList) {
 							if (gameData.getProperty(PropKeys.Name).equalsIgnoreCase(args[1])) {
+								GD = gameData;
 								successful = true;
 								gameData.addKit(player.getLocation());
 								break;
 							}
 						}
 						if (successful) {
-							player.sendMessage("Kit has been successfully created!");
+							player.sendMessage(ChatColor.BLUE+""+ChatColor.BOLD+GD.getProperty(PropKeys.Name)+ChatColor.RESET+": "+ChatColor.GREEN+"Kit has been successfully created!");
+						}else {
+							player.sendMessage(ChatColor.RED+"Invalid game name");
 						}
 					}else {
-						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be two: <modify> [name] <addKit>");
+						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be three: <modify> [name] <addKit>");
 					}
 				}else if (args[2].equalsIgnoreCase("addSpawn")) {
-					
+					if (args.length == 3) {
+						boolean successful = false;
+						GameData GD = null;
+						for (GameData gameData: gameDataList) {
+							if (gameData.getProperty(PropKeys.Name).equalsIgnoreCase(args[1])) {
+								GD = gameData;
+								successful = true;
+								GD.addSpawn(new Coord(player.getLocation()));
+								break;
+							}
+						}
+						if (successful) {
+							player.sendMessage(ChatColor.BLUE+""+ChatColor.BOLD+GD.getProperty(PropKeys.Name)+ChatColor.RESET+": "+ChatColor.GREEN+"spawn has been successfully added!");
+						}else {
+							player.sendMessage(ChatColor.RED+"Invalid game name");
+						}
+					}else {
+						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be three: <modify> [name] <addSpawn>");
+					}
+				}else if (args[2].equalsIgnoreCase("showSpawns")) {
+					if (args.length == 3) {
+						boolean successful = false;
+						GameData GD = null;
+						for (GameData gameData: gameDataList) {
+							if (gameData.getProperty(PropKeys.Name).equalsIgnoreCase(args[1])) {
+								GD = gameData;
+								successful = true;
+								GD.toggleSpawnMarkers();
+								break;
+							}
+						}
+						if (successful) {
+							player.sendMessage(ChatColor.BLUE+""+ChatColor.BOLD+GD.getProperty(PropKeys.Name)+ChatColor.RESET+": "+ChatColor.GREEN+"show spawns has been toggled!");
+						}else {
+							player.sendMessage(ChatColor.RED+"Invalid game name");
+						}
+					}else {
+						player.sendMessage(ChatColor.RED+"Invalid amount of args there should only be three: <modify> [name] <showSpawns>");
+					}
 				}
 			}else {
 				player.sendMessage(ChatColor.RED+"Unknown arg at space 1: "+args[0]);

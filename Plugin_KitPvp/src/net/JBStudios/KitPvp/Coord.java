@@ -12,12 +12,14 @@ public class Coord extends Location {
 	}
 	
 	public Coord(String location) {
-		super(Bukkit.getWorld(location.substring(1, location.length()-1).split(",")[0]),
-				Double.parseDouble(location.substring(1, location.length()-1).split(",")[1]),
-				Double.parseDouble(location.substring(1, location.length()-1).split(",")[2]),
-				Double.parseDouble(location.substring(1, location.length()-1).split(",")[3]));
-		setPitch(Float.parseFloat(location.substring(1, location.length()-1).split(",")[4]));
-		setYaw(Float.parseFloat(location.substring(1, location.length()-1).split(",")[5]));
+		super(null, 0d, 0d, 0d);
+		String[] locations = location.substring(1, location.length()-1).split(",");
+		setWorld(Bukkit.getWorld(locations[0]));
+		setX(Double.parseDouble(locations[1]));
+		setY(Double.parseDouble(locations[2]));
+		setZ(Double.parseDouble(locations[3]));
+		setPitch(Float.parseFloat(locations[4]));
+		setYaw(Float.parseFloat(locations[5]));
 		while (getWorld() == null) {
 			setWorld(Bukkit.getWorld(location.substring(1, location.length()-1).split(",")[0]));
 		}

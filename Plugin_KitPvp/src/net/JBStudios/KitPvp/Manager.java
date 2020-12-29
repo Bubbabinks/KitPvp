@@ -32,7 +32,11 @@ public class Manager extends JavaPlugin {
 				Properties properties = new Properties();
 				try {
 					properties.load(new FileInputStream(new File(propertiesFile+"/gameData.properties")));
-					gameDataList.add(new GameData(properties));
+					getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+						public void run() {
+							gameDataList.add(new GameData(properties));
+						}
+					});
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -82,6 +86,12 @@ public class Manager extends JavaPlugin {
 	
 	public static Manager getManager() {
 		return manager;
+	}
+	
+	public void removeKit(Kit kit) {
+		for (GameData gameData: gameDataList) {
+			gameData.removeKit(kit);
+		}
 	}
 	
 	public static void fileDeletor(File file) {

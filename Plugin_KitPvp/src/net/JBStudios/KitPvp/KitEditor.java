@@ -4,19 +4,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class KitEditor implements Listener {
 	
 	private Inventory inventory;
 	private Kit kit;
+	private Player player;
 	
 	public KitEditor(Kit kit, Player player) {
 		this.kit = kit;
+		this.player = player;
 		Bukkit.getPluginManager().registerEvents(this, Manager.getManager());
 		generateInventory();
 		player.openInventory(inventory);
@@ -28,6 +32,13 @@ public class KitEditor implements Listener {
 			if (e.getCurrentItem() != null) {
 				if (e.getCurrentItem().getType() == Material.BARRIER) {
 					e.setCancelled(true);
+				}else if (e.getCurrentItem().getType() == Material.NETHER_STAR) {
+					if (e.getSlot() == 26) {
+						e.setCancelled(true);
+						player.closeInventory();
+						kit.disable();
+						Manager.getManager().removeKit(kit);
+					}
 				}
 			}
 		}
@@ -62,11 +73,18 @@ public class KitEditor implements Listener {
 			
 			for (int i=18;i<54;i++) {
 				if (inventory.getItem(i) != null) {
-					kit.addItem(new Item(i-18, inventory.getItem(i)));
+					if (i == 27) {
+						ItemMeta meta = inventory.getItem(i).getItemMeta();
+						meta.setDisplayName("Click To Leave");
+						inventory.getItem(i).setItemMeta(meta);
+					}else {
+						kit.addItem(new Item(i-18, inventory.getItem(i)));
+					}
 				}
 			}
 			
 			kit.refreshArmorStand();
+			HandlerList.unregisterAll(this);
 		}
 	}
 	
@@ -104,6 +122,13 @@ public class KitEditor implements Listener {
 				inventory.setItem(8, item);
 			}
 		}
+		
+		ItemStack netherStar = new ItemStack(Material.NETHER_STAR);
+		ItemMeta meta = netherStar.getItemMeta();
+		meta.setDisplayName("Click To Delete Kit");
+		netherStar.setItemMeta(meta);
+		
+		inventory.setItem(26, netherStar);
 		
 		return inventory;
 	}
