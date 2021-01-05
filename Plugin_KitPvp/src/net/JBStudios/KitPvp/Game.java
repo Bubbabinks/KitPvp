@@ -12,6 +12,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -107,6 +108,15 @@ public class Game implements Listener, Runnable {
 					playerLeaveGame(player);
 				}
 			});
+		}
+	}
+	
+	@EventHandler
+	public void onPlayerLeave(PlayerQuitEvent e) {
+		for (Player player: players.keySet()) {
+			if (player.getUniqueId().equals(e.getPlayer().getUniqueId())) {
+				players.remove(player);
+			}
 		}
 	}
 	

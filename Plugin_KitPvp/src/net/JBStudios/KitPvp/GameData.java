@@ -4,12 +4,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.potion.PotionEffect;
 
 import net.JBStudios.KitPvp.Kit.KitListener;
 
@@ -49,6 +51,7 @@ public class GameData implements Listener {
 		game = new Game(this);
 		spawnMarkersEnabled = false;
 		setProperty(PropKeys.Name, name);
+		Bukkit.getPluginManager().registerEvents(this, Manager.getManager());
 	}
 	
 	public GameData(Properties properties) {
@@ -75,11 +78,21 @@ public class GameData implements Listener {
 			properties.remove("spawn"+i);
 			i++;
 		}
+		Bukkit.getPluginManager().registerEvents(this, Manager.getManager());
 	}
 	
 	@EventHandler
 	public void onJoinGame(PlayerJoinEvent e) {
-		
+		Player player = e.getPlayer();
+		if (spawns.size() > 0) {
+			if (spawns.get(0).getWorld().equals(player.getWorld())) {
+				for (PotionEffect effect: player.getActivePotionEffects()) {
+					player.removePotionEffect(effect.getType());
+				}
+				player.getInventory().clear();
+				player.teleport(new Coord(getProperty(PropKeys.WorldSpawn)));
+			}
+		}
 	}
 	
 	public void addSpawn(Coord coord) {
