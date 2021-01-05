@@ -1,6 +1,8 @@
 package net.JBStudios.KitPvp;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -12,19 +14,35 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import net.JBStudios.KitPvp.GameData.PropKeys;
 
-public class Game implements Listener {
+public class Game implements Listener, Runnable {
 
 	private GameData gameData;
 	
-	private ArrayList<Player> players;
+	private Map<Player, Kit> players;
+	
+	private int taskId;
 	
 	public Game(GameData gameData) {
 		this.gameData = gameData;
-		players = new ArrayList<Player>();
+		players = new HashMap<Player, Kit>();
 		Bukkit.getPluginManager().registerEvents(this, Manager.getManager());
+		taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Manager.getManager(), this, 0L, 5L);
+	}
+	
+	public void run() {
+		for (Player player: players.keySet()) {
+			Kit kit = players.get(player);
+			List<Integer> effects = kit.getKitEffects();
+			for (int i=0;i<effects.size();i++) {
+				if (effects.get(i) > 0) {
+					player.addPotionEffect(new PotionEffect(PotionEffectType.values()[i], 100, effects.get(i)-1, true, false));
+				}
+			}
+		}
 	}
 	
 	public void addPlayer(Player player, Kit kit) {
@@ -61,13 +79,16 @@ public class Game implements Listener {
 			}
 		}
 		
+		player.setHealth(20);
+		player.setFoodLevel(20);
+		
 		player.teleport(gameData.getSpawns().get((int)(Math.random()*((double)gameData.getSpawns().size()))));
-		players.add(player);
+		players.put(player, kit);
 	}
 	
 	@EventHandler
 	public void onPlayerDropItem(PlayerDropItemEvent e) {
-		if (players.contains(e.getPlayer())) {
+		if (players.keySet().contains(e.getPlayer())) {
 			if (e.getItemDrop().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase("Drop To Leave")) {
 				playerLeaveGame(e.getPlayer());
 			}
@@ -77,7 +98,7 @@ public class Game implements Listener {
 	
 	@EventHandler
 	public void onDeath(PlayerDeathEvent e) {
-		if (players.contains(e.getEntity())) {
+		if (players.keySet().contains(e.getEntity())) {
 			Player player = e.getEntity();
 			e.getDrops().clear();
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Manager.getManager(), new Runnable() {
@@ -101,7 +122,7 @@ public class Game implements Listener {
 	}
 	
 	public void disable() {
-		for (Player player: players) {
+		for (Player player: players.keySet()) {
 			player.getInventory().clear();
 			for (PotionEffect effect: player.getActivePotionEffects()) {
 				player.removePotionEffect(effect.getType());
@@ -110,6 +131,7 @@ public class Game implements Listener {
 			
 		}
 		players.clear();
+		Bukkit.getScheduler().cancelTask(taskId);
 		HandlerList.unregisterAll(this);
 	}
 	

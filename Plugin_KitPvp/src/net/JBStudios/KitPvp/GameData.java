@@ -1,17 +1,15 @@
 package net.JBStudios.KitPvp;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import net.JBStudios.KitPvp.Kit.KitListener;
 
@@ -62,11 +60,7 @@ public class GameData implements Listener {
 		spawnMarkersEnabled = false;
 		for (File file: new File(Manager.getManager().getDataFolder().toString()+"/"+getProperty(PropKeys.Name)).listFiles()) {
 			if (file.getName().contains("kit")) {
-				Properties p = new Properties();
-				try {
-					p.load(new FileInputStream(file));
-				} catch (FileNotFoundException e) {} catch (IOException e) {}
-				Kit kit = new Kit(p);
+				Kit kit = new Kit(file);
 				kit.addKitListener(new KitListener() {
 					public void onKitSelected(Player player, Kit kit) {
 						game.addPlayer(player, kit);
@@ -81,6 +75,11 @@ public class GameData implements Listener {
 			properties.remove("spawn"+i);
 			i++;
 		}
+	}
+	
+	@EventHandler
+	public void onJoinGame(PlayerJoinEvent e) {
+		
 	}
 	
 	public void addSpawn(Coord coord) {
@@ -131,15 +130,17 @@ public class GameData implements Listener {
 	}
 	
 	public void addKit(Location location) {
-		if (Math.abs(location.getYaw()) <= 45) {
-			location.setYaw(0f);
-		}else if (location.getYaw() < 135f && location.getYaw() > 45f) {
-			location.setYaw(90f);
-		}else if (location.getYaw() > -135f && location.getYaw() < -45f) {
-			location.setYaw(-90f);
-		}else {
-			location.setYaw(180f);
+		float yaw = 180f;
+		if (location.getYaw() < 45f || location.getYaw() > 315) {
+			yaw = 0f;
 		}
+		if (location.getYaw() < 135f && location.getYaw() > 45f) {
+			yaw = 90f;
+		}
+		if (location.getYaw() > 255f && location.getYaw() < 315) {
+			yaw = -90;
+		}
+		location.setYaw(yaw);
 		location.setPitch(0f);
 		Coord coord = new Coord(location);
 		
@@ -150,7 +151,7 @@ public class GameData implements Listener {
 			}
 		});
 		
-		kits.add(new Kit(coord));
+		kits.add(kit);
 	}
 	
 	public void removeKit(Kit kit) {
@@ -160,10 +161,7 @@ public class GameData implements Listener {
 	public void disable() {
 		for (int i=0;i<kits.size();i++) {
 			kits.get(i).disable();
-			Properties properties = kits.get(i).generateProperties();
-			try {
-				properties.store(new FileOutputStream(new File(Manager.getManager().getDataFolder().toString()+"/"+getProperty(PropKeys.Name)+"/kit"+i+".properties")), "");
-			} catch (FileNotFoundException e) {} catch (IOException e) {}
+			kits.get(i).saveKit(new File(Manager.getManager().getDataFolder().toString()+"/"+getProperty(PropKeys.Name)+"/kit"+i+".yml"));
 		}
 		for (int i=0;i<spawnMarkers.size();i++) {
 			spawnMarkers.get(i).disable();

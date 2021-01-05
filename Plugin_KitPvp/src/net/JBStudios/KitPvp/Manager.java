@@ -22,7 +22,6 @@ public class Manager extends JavaPlugin {
 	
 	public void onEnable() {
 		super.onEnable();
-		
 		gameDataList = new ArrayList<GameData>();
 		manager = this;
 		
@@ -44,7 +43,6 @@ public class Manager extends JavaPlugin {
 				}
 			}
 		}
-		
 		getCommand("KP").setExecutor(new Executor());
 		getCommand("KP").setTabCompleter(new Completer());
 		
@@ -53,7 +51,6 @@ public class Manager extends JavaPlugin {
 	
 	public void onDisable() {
 		super.onDisable();
-		
 		File file = getDataFolder();
 		if (!file.exists()) {
 			file.mkdir();
