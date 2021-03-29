@@ -1,7 +1,7 @@
 name: KitPvp
-version: 1.0
+version: 1.1
 author: JBStudios
-main: net.JBStudios.KitPvp.Manager
+main: net.jbstudios.kitpvp.Manager
 api-version: 1.16
 commands:
     KP:
